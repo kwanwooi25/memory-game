@@ -1,15 +1,30 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700');
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  transition: .1s;
+  transition: .2s;
+}
+
+body {
+  margin: 0;
+  font-family: 'Lato', sans-serif;
+}
+
+footer {
+  position: sticky;
+  background: #eee;
+  padding: 1rem;
+  margin-top: 1rem;
+  text-align: center;
 }
 
 #root {
   display: grid;
   grid-gap: 1.5rem;
   grid-template-columns: auto 150px;
-  width: 860px;
+  width: 800px;
   margin: auto;
 }
 
@@ -24,25 +39,50 @@
 }
 
 .card {
-  background: #333;
-  color: #333;
-  border-radius: 0.5rem;
-  border: 2px solid #333;
+  border: 2px solid #ccc;
+  border-radius: .5rem;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-  cursor: pointer;
-  width: 100%;
-  height: 8rem;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: all .1s linear;
+}
 
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  font-size: 3rem;
+.card,
+.card__front,
+.card__back {
+  color: #333;
+  cursor: pointer;
+  height: 7rem;
+  width: 100%;
+}
+
+.card__front,
+.card__back {
+  border-radius: .2rem;
+  height: 6.75rem;
+}
+
+.card__front,
+.card__back {
+  position: absolute;
+  backface-visibility: hidden;
+}
+
+.card__front {
+  background: url('./images/kwanwoojeong.png') no-repeat center center / contain;
+}
+
+.card__back {
+  transform: rotateY(180deg);
+  background-color: #E1DCC7;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
 }
 
 .open {
-  background: white;
   box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-  transform: scale(1.05);
+  transform: scale(1.05) rotateY(180deg);
 }
 
 .mousedown {
@@ -51,15 +91,23 @@
 }
 
 .match {
-  background: #05fd89;
   border-color: #05fd89;
   cursor: default;
+  transform: rotateY(180deg);
+  pointer-events: none;
+}
+
+.match .card__back {
+  background-color: #05fd89;
 }
 
 .unmatch {
-  background: #ff8181;
   border-color: #ff8181;
   cursor: default;
+}
+
+.unmatch .card__back {
+  background-color: #ff8181;
 }
 
 #scoreboard {
@@ -73,13 +121,13 @@
 
 .scoreboard__item__title,
 .scoreboard__item__content {
-  border: 1px solid #cdcdcd;
+  border: 1px solid #efefef;
   font-size: 1.2rem;
   padding: 0.5rem;
 }
 
 .scoreboard__item__title {
-  background: #cdcdcd;
+  background: #efefef;
 }
 
 .scoreboard__item__content {
@@ -102,4 +150,64 @@
   background: white;
   color: #ababab;
   cursor: pointer;
+}
+
+#highscore {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#highscore li {
+  border: 1px solid #efefef;
+  border-top: none;
+  font-size: 1.25rem;
+  font-weight: bold;
+  padding: 0.5rem;
+  text-align: right;
+}
+
+#modal-container {
+  background: rgba(0,0,0,0.5);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
+
+#modal {
+  background: white;
+  border-radius: 0.5rem;
+  width: 400px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem;
+}
+
+#modal__title,
+.modal__description {
+  color: #444;
+}
+
+.modal__description {
+  margin: 0;
+  margin-bottom: .5rem;
+}
+
+#modal__message {
+  font-size: 1.5rem;
+}
+
+.modal__button {
+  border-radius: 0.5rem;
+  width: auto;
+  margin: 1rem;
+  padding: 1rem;
 }

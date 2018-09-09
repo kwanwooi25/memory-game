@@ -2,25 +2,34 @@
   VARIABLES
 ==============================*/
 const board = document.getElementById('gameboard');
+const modalContainer = document.getElementById('modal-container');
+const modalTitle = document.getElementById('modal__title');
+const modalMessage = document.getElementById('modal__message');
+const modalTimeSpent = document.getElementById('modal__timeSpent');
+const modalTotalMoves = document.getElementById('modal__totalMoves');
+const modalClose = document.getElementById('modal__close');
+const highscoreList = document.getElementById('highscore');
 const CARD_LIST = [
-  { name: 'A' },
-  { name: 'B' },
-  { name: 'C' },
-  { name: 'D' },
-  { name: 'E' },
-  { name: 'F' },
-  { name: 'G' },
-  { name: 'H' },
-  { name: 'I' },
-  { name: 'J' },
-  { name: 'K' },
-  { name: 'L' },
+  { name: 'cat', img: 'images/cat.svg' },
+  { name: 'chicken', img: 'images/chicken.svg' },
+  { name: 'cow', img: 'images/cow.svg' },
+  { name: 'dog', img: 'images/dog.svg' },
+  { name: 'elephant', img: 'images/elephant.svg' },
+  { name: 'fox', img: 'images/fox.svg' },
+  { name: 'monkey', img: 'images/monkey.svg' },
+  { name: 'panda', img: 'images/panda.svg' },
+  { name: 'pig', img: 'images/pig.svg' },
+  { name: 'sheep', img: 'images/sheep.svg' },
+  { name: 'tiger', img: 'images/tiger.svg' },
+  { name: 'zibra', img: 'images/zibra.svg' },
 ];
 let cards = [];
 let timer = null;
 let timeSpent = 0;
 let moves = 0;
 let count = 0;
+let score = 0;
+let highscores = [];
 let firstCard = '';
 let secondCard = '';
 let prevTarget = null;
@@ -33,30 +42,103 @@ const startGame = () => {
   cards = shuffle(CARD_LIST.concat(CARD_LIST));
   board.innerHTML = '';
   moves = 0;
+  score = 0;
   renderMoveCount(moves);
+  renderHighScore();
   resetOpenCards();
   resetTimer();
+  renderCards(cards);
+}
 
+const endGame = () => {
+  // stop timer;
+  clearInterval(timer);
+
+  // add up score
+  const timeBonus = (180 - timeSpent) ^ 2;
+  const moveBonus = (50 - moves) ^ 2;
+  const totalPoints = score + timeBonus + moveBonus;
+  highscores = getHighScore();
+  highscores.push(totalPoints);
+  console.log(highscores);
+  highscores = highscores.sort((a, b) => b - a).slice(0, 5);
+  console.log(highscores);
+  setHighScore(highscores);
+
+  // create inner html for modal display
+  let titleHTML = 'Well done!!';
+  let messageHTML = `You've got <b>${totalPoints}</b> points!`;
+  let timeSpentHTML = `
+    Time Spent: <b>${Math.floor(timeSpent / 60)} min ${timeSpent % 60} sec</b>
+  `;
+  let totalMovesHTML = `
+    Total Moves: <b>${moves}</b> times
+  `;
+
+  if (totalPoints < 0) titleHTML = 'Oops!';
+
+  modalTitle.innerHTML = titleHTML;
+  modalMessage.innerHTML = messageHTML;
+  modalTimeSpent.innerHTML = timeSpentHTML;
+  modalTotalMoves.innerHTML = totalMovesHTML;
+  modalContainer.style.display = 'flex';
+  modalClose.addEventListener('click', () => {
+    modalContainer.style.display = 'none';
+    startGame();
+  })
+}
+
+const getHighScore = () => {
+  if (localStorage.getItem('highscore')) {
+    return JSON.parse(localStorage.getItem('highscore'));
+  }
+  return [];
+}
+
+const setHighScore = highscore => {
+  localStorage.setItem('highscore', JSON.stringify(highscore));
+}
+
+const renderHighScore = () => {
+  highscoreList.innerHTML = '';
+  let highscoreHTML = '';
+
+  highscores = getHighScore();
+  if (highscores.length) {
+    highscores.forEach(score => {
+      highscoreHTML += `
+        <li>${score}</li>
+      `;
+    })
+  } else {
+    highscoreHTML = `
+      <li>Not Played Yet</li>
+    `;
+  }
+
+  highscoreList.innerHTML = highscoreHTML;
+}
+
+const renderCards = cards => {
   cards.forEach(card => {
-    // const innerHTML = `
-    //   <div class="card__inner">
-    //     <div class="card__back">
-    //     </div>
-    //     <div class="card__front">
-    //       ${card.name}
-    //     </div>
-    //   </div>
-    // `;
-
     const element = document.createElement('div');
     element.classList.add('card');
     element.dataset.name = card.name;
-    element.textContent = card.name;
+
+    const front = document.createElement('div');
+    front.classList.add('card__front');
+
+    const back = document.createElement('div');
+    back.classList.add('card__back');
+    back.style.backgroundImage = `url(${card.img})`;
+
     element.addEventListener('mousedown', onCardMouseDown);
     element.addEventListener('mouseup', onCardMouseUp);
     element.addEventListener('click', onCardClick);
 
     board.appendChild(element);
+    element.appendChild(front);
+    element.appendChild(back);
   });
 }
 
@@ -65,9 +147,9 @@ const shuffle = cards => {
 }
 
 const onCardClick = e => {
-  const target = e.target;
+  const target = e.target.parentNode;
 
-  if (count < 2 && prevTarget !== target) {
+  if (count < 2 && prevTarget !== target && target.tagName !== 'SECTION') {
     count++;
 
     if (count === 1) {
@@ -80,7 +162,7 @@ const onCardClick = e => {
 
     if (firstCard !== '' && secondCard !== '')  {
       if (firstCard === secondCard) {
-        onCardMatch();
+        setTimeout(onCardMatch, 250);
       } else {
         onCardUnmatch();
       }
@@ -94,18 +176,23 @@ const onCardClick = e => {
 }
 
 const onCardMouseDown = e => {
-  e.target.classList.add('mousedown');
+  e.target.parentNode.classList.add('mousedown');
 }
 
 const onCardMouseUp = e => {
-  e.target.classList.remove('mousedown');
+  e.target.parentNode.classList.remove('mousedown');
 }
 
 const onCardMatch = () => {
+  score += 20;
   const cardsOpen = document.querySelectorAll('.open');
   cardsOpen.forEach(card => {
     card.classList.add('match');
   });
+  const cardsMatched = document.querySelectorAll('.match');
+  if (cardsMatched.length === cards.length) {
+    endGame();
+  }
   resetOpenCards();
 };
 
@@ -114,7 +201,7 @@ const onCardUnmatch = () => {
   cardsOpen.forEach(card => {
     card.classList.add('unmatch');
   });
-  setTimeout(resetOpenCards, 500);
+  setTimeout(resetOpenCards, 1000);
 };
 
 const resetOpenCards = () => {

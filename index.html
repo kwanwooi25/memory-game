@@ -8,11 +8,12 @@
   <title>Memory Game</title>
 </head>
 <body>
+  <!-- main area -->
   <main>
     <h1 class="game-title">Memory Game</h1>
     <div id="root">
-      <div id="gameboard"></div>
-      <div id="controls">
+      <section id="gameboard"></section>
+      <section id="controls">
         <div id="scoreboard">
           <div class="scoreboard__item">
             <div class="scoreboard__item__title">Time</div>
@@ -23,12 +24,53 @@
             <div id="moveCounter" class="scoreboard__item__content">0</div>
           </div>
         </div>
-        <div id="buttons">
+        <div class="buttons">
           <button id="restart" class="button">Restart</button>
         </div>
-      </div>
+        <div class="scoreboard__item">
+          <div class="scoreboard__item__title">HighScore</div>
+          <ul id="highscore">
+            <li>1,230</li>
+            <li>1,000</li>
+            <li>900</li>
+            <li>823</li>
+            <li>123</li>
+          </ul>
+        </div>
+      </section>
     </div>
   </main>
+
+  <!-- modal -->
+  <div id="modal-container">
+    <div id="modal">
+      <h1 id="modal__title">Well done!</h1>
+      <p id="modal__message" class="modal__description">
+        You've got <b>10,000</b> points!
+      </p>
+      <p id="modal__timeSpent" class="modal__description">
+        Time Spent: <b>00 min 00 sec</b>
+      </p>
+      <p id="modal__totalMoves" class="modal__description">
+        Total Moves: <b>00</b> times
+      </p>
+      <button id="modal__close" class="button modal__button">Close</button>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <footer>
+    <div class="credit">
+      Animal illustration designed by
+      <a
+        href="https://www.freepik.com/free-vector/flat-animal-heads-set_715458.htm"
+        target="_blank"
+      >
+        Freepik
+      </a>
+    </div>
+    <div class="copyright">&copy; Kwanwoo Jeong 2018</div>
+  </footer>
 
   <script src="script.js"></script>
 </body>
